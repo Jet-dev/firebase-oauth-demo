@@ -16,7 +16,10 @@ interface FirebaseConfig {
 
 window.onload = () => {
     setInputValueWithConfigFromLocalstorage();
+    addConfigListener();
+};
 
+const addConfigListener = () => {
     document.getElementById('add-config')?.addEventListener('click', (event) => {
         event.preventDefault();
         const apiKey = getInputValue('api-key');
@@ -37,17 +40,15 @@ window.onload = () => {
 
         try {
             initializeApp(firebaseConfig);
-            provider = new GoogleAuthProvider();
-            auth = getAuth();
-
         } catch ( e ) {
             alert('Configuration incorrect');
         }
-
+        provider = new GoogleAuthProvider();
+        auth = getAuth();
         addConfigToLocalstorage(firebaseConfig);
         addSignIn();
     });
-};
+}
 
 const listenSignInButton = () => {
     document.getElementById('sign-with-google')?.addEventListener('click', () => {
@@ -129,7 +130,7 @@ const setInputValue = (id: string, value: string): void => {
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
     <h1>Rentrez votre configuration Firebase</h1>
-    <form>
+    <form class="w-full">
         <input id="api-key" type="text" placeholder="apiKey">
         <input id="auth-domain" type="text" placeholder="authDomain">
         <input id="project-id" type="text" placeholder="projectId">
