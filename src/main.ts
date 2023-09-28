@@ -1,6 +1,6 @@
 import './style.css';
 import { initializeApp } from 'firebase/app';
-import { AuthProvider, GoogleAuthProvider, OAuthCredential, getAuth, signInWithPopup, Auth } from 'firebase/auth';
+import { AuthProvider, GoogleAuthProvider, getAuth, signInWithPopup, Auth } from 'firebase/auth';
 
 let provider: AuthProvider;
 let auth: Auth;
@@ -50,28 +50,27 @@ const addConfigListener = () => {
         removeAddConfigButton();
         addSignIn();
     });
-}
+};
 
 const setFormToReadOnly = () => {
-    const elements = document.querySelectorAll("#config-form input[type=text]")
+    const elements = document.querySelectorAll('#config-form input[type=text]');
     elements.forEach(element => {
         element.setAttribute('readonly', '');
     });
-}
+};
 
 const removeAddConfigButton = () => {
     document.getElementById('add-config')?.remove();
-}
+};
 
 const listenSignInButton = () => {
     document.getElementById('sign-with-google')?.addEventListener('click', () => {
         signInWithPopup(auth, provider)
-            .then((result) => {
+            .then(async () => {
                 const signInWithGoogleButton = document.getElementById('sign-with-google') as HTMLElement;
                 signInWithGoogleButton.remove();
 
-                const credential = GoogleAuthProvider.credentialFromResult(result) as OAuthCredential;
-                const token = credential.idToken as string;
+                const token: string | undefined = await getAuth().currentUser?.getIdToken();
 
                 const signInContainer = document.getElementById('sign-in-container') as HTMLElement;
                 let preContainer: HTMLElement = document.createElement('div');
@@ -79,11 +78,12 @@ const listenSignInButton = () => {
                     <h2 class="mt-10 mb-6 text-xl">Token</h2>
                     <pre class="bg-[#f4f4f4] border border-[#dddddd] border-l-4 border-l-[#FF772C] leading-10 p-1 pl-1.5 overflow-auto block w-full">${token}</pre>
                     <button id="clipboard-button" class="bg-[#FF772C] text-white py-2 px-4 rounded mt-4">Copier le token</button>
-                `
+                `;
 
                 signInContainer.appendChild(preContainer);
-
-                addTokenToClipboardWhenButtonClick(token);
+                if (token) {
+                    addTokenToClipboardWhenButtonClick(token);
+                }
             }).catch((error) => {
             console.log(error);
         });
